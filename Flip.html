@@ -1,304 +1,244 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<style>
+  <meta charset="UTF-8">
+  <title>翻页时钟</title>
+  <style type="text/css">
     html {
-        height: 100%;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0);
     }
 
     body {
-        height: 100%;
-        background: transparent;
-        overflow: hidden;
-    }
-
-    .digit {
-        position: relative;
-        float: left;
-        width: 10vw;
-        height: 15vw;
-        background-color: #fff;
-        border-radius: 1vw;
-        text-align: center;
-        font-family: 'DafontFont', Arial, sans-serif;
-        font-size: 11vw;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .base {
-        display: block;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: #333;
-    }
-
-    .flap {
-        display: none;
-        position: absolute;
-        width: 100%;
-        height: 50%;
-        background-color: #fff;
-        left: 0;
-        top: 0;
-        border-radius: 1vw 1vw 0 0;
-        transform-origin: 50% 100%;
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-        overflow: hidden;
-    }
-
-    .flap::before {
-        content: attr(data-content);
-        position: absolute;
-        left: 50%;
-    }
-
-    .flap.front::before,
-    .flap.under::before {
-        top: 100%;
-        transform: translate(-50%, -50%);
-    }
-
-    .flap.back {
-        transform: rotateY(180deg);
-    }
-
-    .flap.back::before {
-        top: 100%;
-        transform: translate(-50%, -50%) rotateZ(180deg);
-    }
-
-    .flap.over {
-        z-index: 2;
-    }
-
-    .flap.under {
-        z-index: 1;
-    }
-
-    .flap.front {
-        -webkit-animation: flip-down-front 300ms ease-in both;
-        animation: flip-down-front 300ms ease-in both;
-    }
-
-    .flap.back {
-        -webkit-animation: flip-down-back 300ms ease-in both;
-        animation: flip-down-back 300ms ease-in both;
-    }
-
-    .flap.under {
-        -webkit-animation: fade-under 300ms ease-in both;
-        animation: fade-under 300ms ease-in both;
-    }
-
-    @-webkit-keyframes flip-down-front {
-        0% {
-            transform: rotateX(0deg);
-            background-color: #fff;
-            color: #333;
-        }
-
-        100% {
-            transform: rotateX(-180deg);
-            background-color: #a6a6a6;
-            color: black;
-        }
-    }
-
-    @keyframes flip-down-front {
-        0% {
-            transform: rotateX(0deg);
-            background-color: #fff;
-            color: #333;
-        }
-
-        100% {
-            transform: rotateX(-180deg);
-            background-color: #a6a6a6;
-            color: black;
-        }
-    }
-
-    @-webkit-keyframes flip-down-back {
-        0% {
-            transform: rotateY(180deg) rotateX(0deg);
-            background-color: #a6a6a6;
-            color: black;
-        }
-
-        100% {
-            transform: rotateY(180deg) rotateX(180deg);
-            background-color: #fff;
-            color: #333;
-        }
-    }
-
-    @keyframes flip-down-back {
-        0% {
-            transform: rotateY(180deg) rotateX(0deg);
-            background-color: #a6a6a6;
-            color: black;
-        }
-
-        100% {
-            transform: rotateY(180deg) rotateX(180deg);
-            background-color: #fff;
-            color: #333;
-        }
-    }
-
-    @-webkit-keyframes fade-under {
-        0% {
-            background-color: #a6a6a6;
-            color: black;
-        }
-
-        100% {
-            background-color: #fff;
-            color: #333;
-        }
-    }
-
-    @keyframes fade-under {
-        0% {
-            background-color: #a6a6a6;
-            color: black;
-        }
-
-        100% {
-            background-color: #fff;
-            color: #333;
-        }
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 90vh;
+      background: rgba(0, 0, 0, 0);
     }
 
     .clock {
-        position: absolute;
-        top: 50%;
-        left: 15vw;
-        transform: translateY(-50%);
-        perspective: 100vw;
-        perspective-origin: 50% 50%;
+      display: flex;
     }
 
-    .clock .digit {
-        margin-right: 1vw;
+    /* 时钟的分隔 */
+    .clock .divider {
+      font-size: 50px;
+      line-height: 65px;
+      font-style: normal;
+      color: rgb(238, 238, 238);
     }
 
-    .clock .digit:nth-child(2n+2) {
-        margin-right: 3.5vw;
+    /* 时钟的卡片 */
+    .clock .flip {
+      position: relative;
+      width: 48px;
+      height: 70px;
+      margin: 2px;
+      font-size: 56px;
+      font-family: 'DafontFont', Arial, sans-serif;
+      font-weight: 560;
+      line-height: 70px;
+      text-align: center;
+      background: rgb(238, 238, 238);
+      border: 0px solid rgb(34, 33, 33);
+      border-radius: 11px;
+      box-shadow: 0 0 6px rgba(245, 245, 245, 0.5);
     }
 
-    .clock .digit:last-child {
-        margin-right: 0;
+    /* 时钟上的数字 */
+    .clock .flip .digital::before,
+    .clock .flip .digital::after {
+      position: absolute;
+      content: attr(data-number);
+      left: 0;
+      right: 0;
+      color: rgb(48, 48, 48);
+      background: rgb(238, 238, 238);
+      overflow: hidden;
+      -webkit-perspective: 160px;
+      perspective: 160px;
+    }
+
+    /* 翻页前的数字 */
+    .clock .flip .digital::before {
+      top: 0;
+      bottom: 50%;
+      border-bottom: 1px solid #666;
+      border-radius: 11px 11px 0 0;
+    }
+
+    /* 翻页后的数字 */
+    .clock .flip .digital::after {
+      top: 50%;
+      bottom: 0;
+      line-height: 0;
+      border-radius: 0 0 11px 11px;
+    }
+
+    .clock .flip .back::before,
+    .clock .flip .front::after {
+      z-index: 1;
+    }
+
+    .clock .flip .back::after {
+      z-index: 2;
+    }
+
+    .clock .flip .front::before {
+      z-index: 3;
+    }
+
+    .clock .flip .back::after {
+      -webkit-transform-origin: center top;
+      transform-origin: center top;
+      -webkit-transform: rotateX(0.5turn);
+      transform: rotateX(0.5turn);
+    }
+
+    .clock .flip.running .front::before {
+      -webkit-transform-origin: center bottom;
+      transform-origin: center bottom;
+      -webkit-animation: frontFlipDown 0.6s ease-in-out;
+      animation: frontFlipDown 0.6s ease-in-out;
+      box-shadow: 0 -2px 6px rgba(255, 255, 255, 0.3);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+
+    .clock .flip.running .back::after {
+      -webkit-animation: backFlipDown 0.6s ease-in-out;
+      animation: backFlipDown 0.6s ease-in-out;
+    }
+
+    @-webkit-keyframes frontFlipDown {
+      to {
+        -webkit-transform: rotateX(0.5turn);
+        transform: rotateX(0.5turn);
+      }
+    }
+
+    @keyframes frontFlipDown {
+      to {
+        -webkit-transform: rotateX(0.5turn);
+        transform: rotateX(0.5turn);
+      }
+    }
+
+    @-webkit-keyframes backFlipDown {
+      to {
+        -webkit-transform: rotateX(0);
+        transform: rotateX(0);
+      }
+    }
+
+    @keyframes backFlipDown {
+      to {
+        -webkit-transform: rotateX(0);
+        transform: rotateX(0);
+      }
     }
 
     @font-face {
-        font-family: 'DafontFont';
-        src: url('./dogica.ttf') format('truetype');
+      font-family: 'DafontFont';
+      src: url('./dogica.ttf') format('truetype');
     }
-</style>
+  </style>
 
-<body>
-    <div class="clock">
+</head>
 
-        <div class="digit tenhour">
-            <span class="base"></span>
-            <div class="flap over front"></div>
-            <div class="flap over back"></div>
-            <div class="flap under"></div>
-        </div>
-
-        <div class="digit hour">
-            <span class="base"></span>
-            <div class="flap over front"></div>
-            <div class="flap over back"></div>
-            <div class="flap under"></div>
-        </div>
-
-        <div class="digit tenmin">
-            <span class="base"></span>
-            <div class="flap over front"></div>
-            <div class="flap over back"></div>
-            <div class="flap under"></div>
-        </div>
-
-        <div class="digit min">
-            <span class="base"></span>
-            <div class="flap over front"></div>
-            <div class="flap over back"></div>
-            <div class="flap under"></div>
-        </div>
-
-        <div class="digit tensec">
-            <span class="base"></span>
-            <div class="flap over front"></div>
-            <div class="flap over back"></div>
-            <div class="flap under"></div>
-        </div>
-
-        <div class="digit sec">
-            <span class="base"></span>
-            <div class="flap over front"></div>
-            <div class="flap over back"></div>
-            <div class="flap under"></div>
-        </div>
-        <script>
-            function flipTo(digit, n) {
-                var current = digit.attr('data-num');
-                digit.attr('data-num', n);
-                digit.find('.front').attr('data-content', current);
-                digit.find('.back, .under').attr('data-content', n);
-                digit.find('.flap').css('display', 'block');
-                setTimeout(function () {
-                    digit.find('.base').text(n);
-                    digit.find('.flap').css('display', 'none');
-                }, 350);
-            }
-
-            function jumpTo(digit, n) {
-                digit.attr('data-num', n);
-                digit.find('.base').text(n);
-            }
-
-            function updateGroup(group, n, flip) {
-                var digit1 = $('.ten' + group);
-                var digit2 = $('.' + group);
-                n = String(n);
-                if (n.length == 1) n = '0' + n;
-                var num1 = n.substr(0, 1);
-                var num2 = n.substr(1, 1);
-                if (digit1.attr('data-num') != num1) {
-                    if (flip) flipTo(digit1, num1);
-                    else jumpTo(digit1, num1);
-                }
-                if (digit2.attr('data-num') != num2) {
-                    if (flip) flipTo(digit2, num2);
-                    else jumpTo(digit2, num2);
-                }
-            }
-
-            function setTime(flip) {
-                var t = new Date();
-                updateGroup('hour', t.getHours(), flip);
-                updateGroup('min', t.getMinutes(), flip);
-                updateGroup('sec', t.getSeconds(), flip);
-            }
-
-            $(document).ready(function () {
-
-                setTime(false);
-                setInterval(function () {
-                    setTime(true);
-                }, 1000);
-
-            });
-        </script>
+<body style="overflow-x:hidden;overflow-y:hidden;background:rgba(0,0,0,0)">
+  <div class="clock">
+    <div class="flip">
+      <div class="digital front" data-number="0"></div>
+      <div class="digital back" data-number="1"></div>
     </div>
+    <div class="flip">
+      <div class="digital front" data-number="0"></div>
+      <div class="digital back" data-number="1"></div>
+    </div>
+    <em class="divider">:</em>
+    <div class="flip">
+      <div class="digital front" data-number="0"></div>
+      <div class="digital back" data-number="1"></div>
+    </div>
+    <div class="flip">
+      <div class="digital front" data-number="0"></div>
+      <div class="digital back" data-number="1"></div>
+    </div>
+    <em class="divider">:</em>
+    <div class="flip">
+      <div class="digital front" data-number="0"></div>
+      <div class="digital back" data-number="1"></div>
+    </div>
+    <div class="flip">
+      <div class="digital front" data-number="0"></div>
+      <div class="digital back" data-number="1"></div>
+    </div>
+  </div>
+
+  <!-- partial -->
+  <script>
+    var Flipper = /** @class */ (function () {
+      function Flipper(node, currentTime, nextTime) {
+        this.isFlipping = false;
+        this.duration = 600;
+        this.flipNode = node;
+        this.frontNode = node.querySelector(".front");
+        this.backNode = node.querySelector(".back");
+        this.setFrontTime(currentTime);
+        this.setBackTime(nextTime);
+      }
+      Flipper.prototype.setFrontTime = function (time) {
+        this.frontNode.dataset.number = time;
+      };
+      Flipper.prototype.setBackTime = function (time) {
+        this.backNode.dataset.number = time;
+      };
+      Flipper.prototype.flipDown = function (currentTime, nextTime) {
+        var _this = this;
+        if (this.isFlipping) {
+          return false;
+        }
+        this.isFlipping = true;
+        this.setFrontTime(currentTime);
+        this.setBackTime(nextTime);
+        this.flipNode.classList.add("running");
+        setTimeout(function () {
+          _this.flipNode.classList.remove("running");
+          _this.isFlipping = false;
+          _this.setFrontTime(nextTime);
+        }, this.duration);
+      };
+      return Flipper;
+    }());
+
+    var getTimeFromDate = function (date) {
+      return date
+        .toTimeString()
+        .slice(0, 8)
+        .split(":")
+        .join("");
+    };
+
+    var flips = document.querySelectorAll(".flip");
+    var now = new Date();
+    var nowTimeStr = getTimeFromDate(new Date(now.getTime() - 1000));
+    var nextTimeStr = getTimeFromDate(now);
+    var flippers = Array.from(flips).map(function (flip, i) { return new Flipper(flip, nowTimeStr[i], nextTimeStr[i]); });
+    setInterval(function () {
+      var now = new Date();
+      var nowTimeStr = getTimeFromDate(new Date(now.getTime() - 1000));
+      var nextTimeStr = getTimeFromDate(now);
+      for (var i = 0; i < flippers.length; i++) {
+        if (nowTimeStr[i] === nextTimeStr[i]) {
+          continue;
+        }
+        flippers[i].flipDown(nowTimeStr[i], nextTimeStr[i]);
+      }
+    }, 1000);	  
+  </script>
+</body>
 
 </html>
